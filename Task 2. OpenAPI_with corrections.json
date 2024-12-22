@@ -1,0 +1,442 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API Documentation",
+    "version": "1.0.0",
+    "description": "The API enables users to manage service plans, which they may choose to subscribe to, though it's not required. Plans are customizable through the API and are tied to the user's provider, meaning not all plans are available to every user. When a user subscribes, their status changes to “signing” until the process is confirmed. The user model also includes a new attribute, “sub_status,” which reflects the values: “signed,” “unsigned,” and “absent.” These values cannot be modified via requests.\n\nEach partner's available plans are restricted by a mapping of existing user types, excluding “guest” and “admin.” These can be specified in requests as a comma-separated list. Plans can be created, updated, and deleted. Information requests support optional identifiers and pagination. Basic authorization is required for any modifications to plans."
+  },
+  "tags": [
+    {
+      "name": "user",
+      "description": "External User API"
+    },
+    {
+      "name": "partner",
+      "description": "Partner API"
+    },
+    {
+      "name": "plan",
+      "description": "Service Plans API"
+    }
+  ],
+  "paths": {
+    "/api/external/user": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get User Information",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "description": "Unique user identifier.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "3453255"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Pagination start timestamp.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Pagination end timestamp.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit to records returned.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1000,
+              "minimum": 10,
+              "maximum": 1000
+            }
+          },
+          {
+            "name": "provider_id",
+            "in": "query",
+            "description": "Unique identifier of the partner a user is bound to.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2323"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "example": "3453255"
+                    },
+                    "provider_id": {
+                      "type": "string",
+                      "example": "2323"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "active",
+                        "inactive",
+                        "idle"
+                      ]
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "basic",
+                        "guest",
+                        "company",
+                        "advanced",
+                        "admin"
+                      ]
+                    },
+                    "zone": {
+                      "type": "string",
+                      "example": "ru"
+                    },
+                    "sub_status": {
+                      "type": "string",
+                      "enum": [
+                        "signed",
+                        "unsigned",
+                        "absent"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/partner": {
+      "get": {
+        "tags": [
+          "partner"
+        ],
+        "summary": "Get Partner Information",
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "query",
+            "description": "Unique partner identifier.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "2323"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Partner operation state.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "stopped"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "provider_id": {
+                      "type": "string",
+                      "example": "2323"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "active",
+                        "stopped"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plan": {
+      "get": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Get Service Plans",
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "query",
+            "description": "Unique plan identifier.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "98765"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Pagination start timestamp.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Pagination end timestamp.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit to records returned.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1000,
+              "minimum": 10,
+              "maximum": 1000
+            }
+          },
+          {
+            "name": "provider_id",
+            "in": "query",
+            "description": "Unique identifier of the partner to whom the plan is tied.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2323"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "plan_id": {
+                      "type": "string",
+                      "example": "98765"
+                    },
+                    "provider_id": {
+                      "type": "string",
+                      "example": "2323"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Basic Plan"
+                    },
+                    "available_to_types": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "basic",
+                          "company",
+                          "advanced"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Create a new Service Plan",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "provider_id": {
+                    "type": "string",
+                    "example": "2323"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Premium Plan"
+                  },
+                  "available_to_types": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "basic",
+                        "company",
+                        "advanced"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "provider_id",
+                  "name",
+                  "available_to_types"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Plan created successfully"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Update an existing Service Plan",
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "query",
+            "description": "Unique plan identifier.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "98765"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "provider_id": {
+                    "type": "string",
+                    "example": "2323"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Updated Premium Plan"
+                  },
+                  "available_to_types": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "basic",
+                        "company",
+                        "advanced"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Plan updated successfully"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Delete a Service Plan",
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "query",
+            "description": "Unique plan identifier.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "98765"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Plan deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
